@@ -1,9 +1,13 @@
 #include <stdlib.h>
-
+#include <random>
 #include "vector.h"
 #include "ray.h"
 #include "material.h"
-
+std::default_random_engine generator;
+std::uniform_real_distribution<double> distr(0.0, 1.0);
+double erand48m(int X){
+	return distr(generator);
+}
 Material::Material(MaterialType t, Vec c, Vec e, Texture tex) {
 	m_type=t, m_colour=c, m_emission=e;
     m_texture = tex;
@@ -27,9 +31,9 @@ Ray Material::get_reflected_ray(const Ray &r, Vec &p, const Vec &n,	unsigned sho
         double roughness = 0.8;
         Vec reflected = r.direction - n * 2 * n.dot(r.direction);
         reflected = Vec(
-            reflected.x + (erand48(Xi)-0.5)*roughness,
-            reflected.y + (erand48(Xi)-0.5)*roughness,
-            reflected.z + (erand48(Xi)-0.5)*roughness
+			reflected.x + (erand48m((int)Xi) - 0.5)*roughness,
+			reflected.y + (erand48m((int)Xi) - 0.5)*roughness,
+			reflected.z + (erand48m((int)Xi) - 0.5)*roughness
         ).norm();
 
         return Ray(p, reflected);
@@ -38,7 +42,7 @@ Ray Material::get_reflected_ray(const Ray &r, Vec &p, const Vec &n,	unsigned sho
 	// Ideal diffuse reflection
 	if (m_type == DIFF) {
 		Vec nl=n.dot(r.direction)<0?n:n*-1;
-		double r1=2*M_PI*erand48(Xi), r2=erand48(Xi), r2s=sqrt(r2);
+		double r1 = 2 * M_PI*erand48m((int)Xi), r2 = erand48m((int)Xi), r2s = sqrt(r2);
         Vec w=nl, u=((fabs(w.x)>.1?Vec(0,1):Vec(1))%w).norm(), v=w%u;
         Vec d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1-r2)).norm();
 

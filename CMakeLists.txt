@@ -22,7 +22,7 @@ set(SOURCE_FILES
     src/camera.cpp
     src/scene.cpp
     src/renderer.cpp
-    lib/rand48/rand48.c
+    lib/pcg_basic/pcg_basic.c
     lib/lodepng/lodepng.cpp
     lib/tiny_obj_loader/tiny_obj_loader.cc)
 

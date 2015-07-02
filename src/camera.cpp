@@ -1,6 +1,12 @@
 #include "ray.h"
 #include "camera.h"
-
+#include "linalg.h"
+#include <random>
+static std::default_random_engine generator;
+static std::uniform_real_distribution<double> distr(0.0, 1.0);
+static double erand48m(int X){
+	return distr(generator);
+}
 Camera::Camera(Vec position, Vec target, int width, int height) {
     m_width = width;
     m_width_recp = 1./m_width;
@@ -18,7 +24,23 @@ Camera::Camera(Vec position, Vec target, int width, int height) {
     m_x_spacing_half = m_x_spacing * 0.5;
     m_y_spacing_half = m_y_spacing * 0.5;
 }
+Camera::Camera(Vec position, Vec* rot, int width, int height) {
+	m_width = width;
+	m_width_recp = 1. / m_width;
+	m_height = height;
+	m_height_recp = 1. / m_height;
+	m_ratio = (double)m_width / m_height;
 
+	m_position = position;
+	m_direction = Vec(rot[0].z,rot[1].z,rot[2].z);
+	m_x_direction = Vec(rot[0].x, rot[1].x, rot[2].x);
+	m_y_direction = Vec(-rot[0].y, -rot[1].y, -rot[2].y);
+
+	m_x_spacing = (2.0 * m_ratio) / (double)m_width;
+	m_y_spacing = (double)2.0 / (double)m_height;
+	m_x_spacing_half = m_x_spacing * 0.5;
+	m_y_spacing_half = m_y_spacing * 0.5;
+}
 int Camera::get_width() { return m_width; }
 int Camera::get_height() { return m_height; }
 
@@ -30,8 +52,8 @@ Ray Camera::get_ray(int x, int y, bool jitter, unsigned short *Xi) {
 
     // If jitter == true, jitter point for anti-aliasing
     if (jitter) {
-        x_jitter = (erand48(Xi) * m_x_spacing) - m_x_spacing_half;
-        y_jitter = (erand48(Xi) * m_y_spacing) - m_y_spacing_half;
+        x_jitter = (erand48m((int)Xi) * m_x_spacing) - m_x_spacing_half;
+		y_jitter = (erand48m((int)Xi) * m_y_spacing) - m_y_spacing_half;
 
     }
     else {
