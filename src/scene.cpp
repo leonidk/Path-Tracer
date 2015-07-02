@@ -25,12 +25,12 @@ ObjectIntersection Scene::intersect(const Ray &ray) {
     return isct;
 }
 
-Vec Scene::trace_ray(const Ray &ray, int depth, unsigned short*Xi) {
+std::pair<Vec,float> Scene::trace_ray(const Ray &ray, int depth, unsigned short*Xi) {
 
     ObjectIntersection isct = intersect(ray);
 
     // If no hit, return world colour
-    if (!isct.hit) return Vec();
+	if (!isct.hit) return{};
     /*if (!isct.hit){
         double u, v;
         v = (acos(Vec(0,0,1).dot(ray.direction))/M_PI);
@@ -38,14 +38,19 @@ Vec Scene::trace_ray(const Ray &ray, int depth, unsigned short*Xi) {
         return bg.get_pixel(fabs(u), fabs(v))*1.2;
     }*/
 
-    if (isct.m.get_type() == EMIT) return isct.m.get_emission();
-#ifndef NORMAL
-   Vec x = ray.origin + ray.direction * isct.u;
+	if (isct.m.get_type() == EMIT) return std::make_pair(isct.m.get_emission(), isct.u);
+#ifndef COLORRENDER
+#define NORMAL_COLOR
+#ifndef NORMAL_COLOR
+	Vec x = ray.origin + ray.direction * isct.u;
 
-    Vec colour = isct.m.get_colour();
-	//	Vec c2(isct.n.x / 2.0 + 0.5, isct.n.y / 2.0 + 0.5, isct.n.z / 2.0 + 0.5);
-
-   return colour * isct.n.dot((Vec(1,-3,8)-x).norm());
+	Vec colour = isct.m.get_colour();
+	return std::make_pair(colour * isct.n.dot((Vec(1, -3, 8) - x).norm()), isct.u);
+	dasdasd
+#else
+	Vec c2(isct.n.x / 2.0 + 0.5, isct.n.y / 2.0 + 0.5, isct.n.z / 2.0 + 0.5);
+	return {c2,(float)isct.u};
+#endif
 #else
     // Calculate max reflection
     double p = colour.x>colour.y && colour.x>colour.z ? colour.x : colour.y>colour.z ? colour.y : colour.z;

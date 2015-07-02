@@ -1,6 +1,7 @@
 #include <vector>
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
 
 #include "renderer.h"
 #include "../lib/lodepng/lodepng.h"
@@ -14,6 +15,8 @@ Renderer::Renderer(Scene *scene, Camera *camera) {
     m_scene = scene;
     m_camera = camera;
     m_pixel_buffer = new Vec[m_camera->get_width()*m_camera->get_height()];
+	m_depth_buffer = new float[m_camera->get_width()*m_camera->get_height()];
+
 }
 
 void Renderer::render(int samples) {
@@ -31,13 +34,16 @@ void Renderer::render(int samples) {
 
         for (int x=0; x<width; x++){
             Vec col = Vec();
-
+			float depth = 0;
             for (int a=0; a<samples; a++){
                 Ray ray = m_camera->get_ray(x, y, a>0, Xi);
-                col = col + m_scene->trace_ray(ray,0,Xi);
+				auto res = m_scene->trace_ray(ray, 0, Xi);
+                col = col + res.first;
+				depth += res.second;
             }
 
             m_pixel_buffer[(y)*width + x] = col * samples_recp;
+			m_depth_buffer[y*width + x] = depth*samples_recp;
         }
     }
 }
@@ -63,4 +69,19 @@ void Renderer::save_image(const char *file_path) {
     if(error) std::cout << "encoder error " << error << ": "<< lodepng_error_text(error) << std::endl;
 
     pixel_buffer.clear();
+}
+
+void Renderer::save_depth(const char *file_path) {
+	int width = m_camera->get_width();
+	int height = m_camera->get_height();
+
+	struct raw_header {
+		int32_t w, h, c, bpp;
+	};
+	std::ofstream output(file_path, std::ifstream::binary | std::ifstream::out);
+	raw_header hd{ width,height, 1, sizeof(float) };
+	output.write((char*)&hd, sizeof(raw_header));
+	output.write((char*)m_depth_buffer, width*height*sizeof(float));
+
+	memset(m_depth_buffer, 0, sizeof(float)*width*height);
 }

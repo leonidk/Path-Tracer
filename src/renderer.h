@@ -11,12 +11,12 @@ private:
     Scene *m_scene;
     Camera *m_camera;
     Vec *m_pixel_buffer;
-
+	float *m_depth_buffer;
 public:
     Renderer(Scene *scene, Camera *camera);
     void render(int samples=4);
     void save_image(const char * file_path);
-
+	void save_depth(const char *file_path);
 };
 
 #endif //RENDERER_H

@@ -233,5 +233,8 @@ typedef linalg::vec<float, 4> float4;   typedef linalg::mat<float, 4,2> float4x2
 typedef linalg::vec<double,2> double2;  typedef linalg::mat<double,2,2> double2x2;  typedef linalg::mat<double,2,3> double2x3;  typedef linalg::mat<double,2,4> double2x4; 
 typedef linalg::vec<double,3> double3;  typedef linalg::mat<double,3,2> double3x2;  typedef linalg::mat<double,3,3> double3x3;  typedef linalg::mat<double,3,4> double3x4; 
 typedef linalg::vec<double,4> double4;  typedef linalg::mat<double,4,2> double4x2;  typedef linalg::mat<double,4,3> double4x3;  typedef linalg::mat<double,4,4> double4x4;
-
+inline float4x4 RigidTransformationMatrix(const float4 & rot, const float3 & vec)
+{
+	return{ { qxdir(rot), 0 }, { qydir(rot), 0 }, { qzdir(rot), 0 }, { vec, 1 } };
+}
 #endif // VECMATQUAT_H
