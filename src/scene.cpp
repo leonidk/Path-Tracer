@@ -39,30 +39,30 @@ Vec Scene::trace_ray(const Ray &ray, int depth, unsigned short*Xi) {
     }*/
 
     if (isct.m.get_type() == EMIT) return isct.m.get_emission();
-   Vec x = ray.origin + ray.direction * isct.u;
+  // Vec x = ray.origin + ray.direction * isct.u;
 
     Vec colour = isct.m.get_colour();
 	//	Vec c2(isct.n.x / 2.0 + 0.5, isct.n.y / 2.0 + 0.5, isct.n.z / 2.0 + 0.5);
 
-    return colour * isct.n.dot((Vec(1,-3,8)-x).norm());
+   // return colour * isct.n.dot((Vec(1,-3,8)-x).norm());
 
- //   // Calculate max reflection
- //   double p = colour.x>colour.y && colour.x>colour.z ? colour.x : colour.y>colour.z ? colour.y : colour.z;
+    // Calculate max reflection
+    double p = colour.x>colour.y && colour.x>colour.z ? colour.x : colour.y>colour.z ? colour.y : colour.z;
 
- //   // Russian roulette termination.
- //   // If random number between 0 and 1 is > p, terminate and return hit object's emmission
-	//double rnd = erand48m((int)Xi);
- //   if (++depth>5){
- //       if (rnd<p*0.9) { // Multiply by 0.9 to avoid infinite loop with colours of 1.0
- //           colour=colour*(0.9/p);
- //       }
- //       else {
- //           return isct.m.get_emission();
- //       }
- //   }
+    // Russian roulette termination.
+    // If random number between 0 and 1 is > p, terminate and return hit object's emmission
+	double rnd = erand48m((int)Xi);
+    if (++depth>5){
+        if (rnd<p*0.9) { // Multiply by 0.9 to avoid infinite loop with colours of 1.0
+            colour=colour*(0.9/p);
+        }
+        else {
+            return isct.m.get_emission();
+        }
+    }
 
- //   Vec x = ray.origin + ray.direction * isct.u;
- //   Ray reflected = isct.m.get_reflected_ray(ray, x, isct.n, Xi);
+    Vec x = ray.origin + ray.direction * isct.u;
+    Ray reflected = isct.m.get_reflected_ray(ray, x, isct.n, Xi);
 
- //   return colour.mult( trace_ray(reflected, depth, Xi) );
+    return colour.mult( trace_ray(reflected, depth, Xi) );
 }
