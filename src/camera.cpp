@@ -4,7 +4,7 @@
 #include <random>
 static std::default_random_engine generator;
 static std::uniform_real_distribution<double> distr(0.0, 1.0);
-static double erand48m(int X){
+static double erand48m(int X=0){
 	return distr(generator);
 }
 
@@ -30,15 +30,15 @@ Ray Camera::get_ray(int x, int y, bool jitter, unsigned short *Xi) {
 
     // If jitter == true, jitter point for anti-aliasing
     if (jitter) {
-       // x_jitter = (erand48m((int)Xi) * m_x_spacing) - m_x_spacing_half;
-		//y_jitter = (erand48m((int)Xi) * m_y_spacing) - m_y_spacing_half;
+        x_jitter = erand48m()-0.5f;
+		y_jitter = erand48m()-0.5f;
 
     }
     else {
         x_jitter = 0;
         y_jitter = 0;
     }
-	auto viewDirection = linalg::normalize(float3((x - px)/fx, (y - py) / fy, 1));
+	auto viewDirection = linalg::normalize(float3((x - px + x_jitter) / fx, (y - py + y_jitter) / fy, 1));
 	auto nr = viewPose * SRay{ { 0, 0, 0 }, viewDirection };
 
     //Vec pixel = m_position + m_direction*2;

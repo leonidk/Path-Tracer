@@ -22,7 +22,16 @@ struct Pose
 	float3 TransformDirection(const float3 & direction) const { return qrot(orientation, direction); }
 };
 
+inline float4 RotationQuaternionAxisAngle(const float3 & axisOfRotation, float angleInRadians)
+{
+	return{ axisOfRotation * std::sin(angleInRadians / 2), std::cos(angleInRadians / 2) };
+}
 
+inline float4 RotationQuaternionFromToVec(const float3 & fromVector, const float3 & toVector)
+{
+	auto a = linalg::normalize(fromVector), b = linalg::normalize(toVector);
+	return RotationQuaternionAxisAngle(normz(cross(a, b)), std::acos(dot(a, b)));
+}
 struct SRay
 {
 	float3 origin;
