@@ -39,13 +39,14 @@ Vec Scene::trace_ray(const Ray &ray, int depth, unsigned short*Xi) {
     }*/
 
     if (isct.m.get_type() == EMIT) return isct.m.get_emission();
-  // Vec x = ray.origin + ray.direction * isct.u;
+#ifndef NORMAL
+   Vec x = ray.origin + ray.direction * isct.u;
 
     Vec colour = isct.m.get_colour();
 	//	Vec c2(isct.n.x / 2.0 + 0.5, isct.n.y / 2.0 + 0.5, isct.n.z / 2.0 + 0.5);
 
-   // return colour * isct.n.dot((Vec(1,-3,8)-x).norm());
-
+   return colour * isct.n.dot((Vec(1,-3,8)-x).norm());
+#else
     // Calculate max reflection
     double p = colour.x>colour.y && colour.x>colour.z ? colour.x : colour.y>colour.z ? colour.y : colour.z;
 
@@ -65,4 +66,5 @@ Vec Scene::trace_ray(const Ray &ray, int depth, unsigned short*Xi) {
     Ray reflected = isct.m.get_reflected_ray(ray, x, isct.n, Xi);
 
     return colour.mult( trace_ray(reflected, depth, Xi) );
+#endif
 }

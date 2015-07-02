@@ -49,6 +49,7 @@ private:
 	float fx, fy, px, py;
 public:
 	Camera(Pose& pose, int width, int height);
+	Camera(Pose& pose, int width, int height, float fx, float fy, float px, float py);
 
     int get_width();
     int get_height();

@@ -7,7 +7,13 @@ static std::uniform_real_distribution<double> distr(0.0, 1.0);
 static double erand48m(int X=0){
 	return distr(generator);
 }
+Camera::Camera(Pose& pose, int width, int height,float fx,float fy,float px,float py)
+: px(px),py(py),fx(fx),fy(fy) {
+	m_width = width;
+	m_height = height;
+	viewPose = pose;
 
+}
 Camera::Camera(Pose& pose, int width, int height) {
 	m_width = width;
 	m_height = height;
