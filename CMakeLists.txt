@@ -1,11 +1,18 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(pathtracer)
 
-if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-narrowing -march=native -m64 -O3 -static -funroll-loops")
+if(APPLE)
+    SET(CMAKE_CXX_COMPILER "g++-7")
+    SET(CMAKE_C_COMPILER "gcc-7")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -fopenmp")
 endif()
 
-FIND_PACKAGE( OpenMP REQUIRED)
+
+if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-narrowing -march=native -m64 -O3 -funroll-loops")
+endif()
+
+FIND_PACKAGE( OpenMP )
 if(OPENMP_FOUND)
 	message("OPENMP FOUND")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
